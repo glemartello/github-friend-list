@@ -1,24 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+
+import { Container, Content, Searchbox, List, Button } from "./styles";
+import User from "./components/User";
+
+import ResetCSS from "./globals/resetCSS";
 
 function App() {
+  const [users, setUsers] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleOnAddClick = () => {
+    // chamar API
+    fetch(`https://api.github.com/users/${inputValue}`)
+      .then((response) => response.json())
+      // setar a resposta no users
+      .then((data) => {
+        setUsers((oldState) => [...oldState, data]);
+        console.log(data);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ResetCSS />
+      <Container>
+        <Content>
+          <Searchbox>
+            <input onChange={handleInputChange} value={inputValue} />
+            <Button onClick={handleOnAddClick}>Adicionar</Button>
+          </Searchbox>
+          <List>
+            {users.map((user) => (
+              <User
+                name={user.name}
+                avatar={user.avatar_url}
+                location={user.location}
+              />
+            ))}
+          </List>
+        </Content>
+      </Container>
+    </>
   );
 }
 
